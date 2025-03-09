@@ -16,6 +16,8 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import EmailIcon from '@mui/icons-material/Email';
+import emailjs from '@emailjs/browser';
+import { emailConfig } from '../../config/email';
 
 const contactSchema = Yup.object().shape({
   name: Yup.string()
@@ -44,11 +46,18 @@ const Contact = () => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      // TODO: Implement actual form submission logic
-      console.log('Form values:', values);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await emailjs.send(
+        emailConfig.serviceId,
+        emailConfig.templateId,
+        {
+          from_name: values.name,
+          from_email: values.email,
+          subject: values.subject,
+          message: values.message,
+          to_email: emailConfig.toEmail,
+        },
+        emailConfig.publicKey
+      );
       
       setSnackbar({
         open: true,
@@ -56,7 +65,8 @@ const Contact = () => {
         severity: 'success',
       });
       resetForm();
-    } catch {
+    } catch (error) {
+      console.error('Error sending email:', error);
       setSnackbar({
         open: true,
         message: 'Failed to send message. Please try again later.',
@@ -71,7 +81,7 @@ const Contact = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
-  const whatsappLink = 'https://wa.me/1234567890?text=Hi%20Izoragrafix%2C%20I%20would%20like%20to%20inquire%20about%20your%20services';
+  const whatsappLink = 'https://wa.me/237658908619?text=Hi%20Izoragrafix%2C%20I%20would%20like%20to%20inquire%20about%20your%20services';
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -210,11 +220,11 @@ const Contact = () => {
                     Email
                   </Typography>
                   <Link
-                    href="mailto:ndifonlemuel@gmail.com"
+                    href={`mailto:${emailConfig.toEmail}`}
                     underline="hover"
                     color="text.primary"
                   >
-                    contact@izografix.com
+                    {emailConfig.toEmail}
                   </Link>
                 </Box>
 
@@ -256,7 +266,7 @@ const Contact = () => {
         </Alert>
       </Snackbar>
     </Box>
-    );
+  );
 };
 
 export default Contact;

@@ -24,6 +24,7 @@ const Layout = ({ children }) => {
     { name: 'Gallery', path: '/gallery' },
     { name: 'Reviews', path: '/reviews' },
     { name: 'Contact', path: '/contact' },
+    { name: 'Admin', path: '/admin' },
   ];
 
   const handleOpenNavMenu = (event) => {

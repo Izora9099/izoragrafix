@@ -1,8 +1,12 @@
-import { Container, Typography, Box, Grid, Paper, Rating, Avatar } from '@mui/material';
+import { useState } from 'react';
+import { Container, Typography, Box, Grid, Paper, Rating, Avatar, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import AddIcon from '@mui/icons-material/Add';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ReviewDialog from '../../components/ReviewDialog/ReviewDialog';
 
 const Reviews = () => {
-  const reviews = [
+  const [reviews, setReviews] = useState([
     {
       id: 1,
       name: 'John Smith',
@@ -57,7 +61,7 @@ const Reviews = () => {
       avatar: 'https://via.placeholder.com/60',
       service: 'Design Services',
     },
-  ];
+  ]);
 
   const stats = [
     { label: 'Happy Clients', value: '100+' },
@@ -65,6 +69,58 @@ const Reviews = () => {
     { label: 'Years Experience', value: '5+' },
     { label: 'Awards Won', value: '15+' },
   ];
+
+  // CRUD State
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [activeReviewId, setActiveReviewId] = useState(null);
+
+  // CRUD Handlers
+  const handleAddReview = () => {
+    setSelectedReview(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditReview = (review) => {
+    setSelectedReview(review);
+    setDialogOpen(true);
+    handleCloseMenu();
+  };
+
+  const handleDeleteReview = () => {
+    setReviews(prev => prev.filter(review => review.id !== activeReviewId));
+    handleCloseMenu();
+  };
+
+  const handleSubmitReview = (formData) => {
+    if (selectedReview) {
+      // Edit existing review
+      setReviews(prev => prev.map(review =>
+        review.id === selectedReview.id
+          ? { ...review, ...formData }
+          : review
+      ));
+    } else {
+      // Add new review
+      const newReview = {
+        ...formData,
+        id: Math.max(...reviews.map(r => r.id)) + 1,
+        avatar: 'https://via.placeholder.com/60',
+      };
+      setReviews(prev => [...prev, newReview]);
+    }
+  };
+
+  const handleOpenMenu = (event, reviewId) => {
+    setMenuAnchor(event.currentTarget);
+    setActiveReviewId(reviewId);
+  };
+
+  const handleCloseMenu = () => {
+    setMenuAnchor(null);
+    setActiveReviewId(null);
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -198,67 +254,103 @@ const Reviews = () => {
         }}
       >
         <Container maxWidth={false} sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddReview}
+            >
+              Add Review
+            </Button>
+          </Box>
+
           <Grid container spacing={4}>
             {reviews.map((review) => (
-              <Grid item xs={12} sm={6} md={4} key={review.id}>
+              <Grid item xs={12} md={6} lg={4} key={review.id}>
                 <Paper
-                  elevation={3}
+                  elevation={2}
                   sx={{
-                    p: 4,
+                    p: 3,
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
-                    transition: '0.3s',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: 6,
-                    },
                   }}
                 >
-                  <FormatQuoteIcon
-                    sx={{
-                      position: 'absolute',
-                      top: 16,
-                      right: 16,
-                      color: 'primary.main',
-                      opacity: 0.2,
-                      fontSize: 40,
-                    }}
-                  />
-                  <Box sx={{ mb: 2 }}>
-                    <Rating value={review.rating} readOnly />
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      mb: 3,
-                      fontStyle: 'italic',
-                      flex: 1,
-                    }}
+                  <IconButton
+                    size="small"
+                    sx={{ position: 'absolute', top: 8, right: 8 }}
+                    onClick={(e) => handleOpenMenu(e, review.id)}
                   >
-                    "{review.comment}"
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar src={review.avatar} alt={review.name} />
+                    <MoreVertIcon />
+                  </IconButton>
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar src={review.avatar} alt={review.name} sx={{ width: 60, height: 60, mr: 2 }} />
                     <Box>
-                      <Typography variant="subtitle1" fontWeight="bold">
+                      <Typography variant="h6" gutterBottom>
                         {review.name}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {review.role}
                       </Typography>
-                      <Typography variant="caption" color="primary">
-                        {review.service}
-                      </Typography>
                     </Box>
                   </Box>
+
+                  <Rating value={review.rating} readOnly precision={0.5} sx={{ mb: 2 }} />
+
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      mb: 2,
+                      flex: 1,
+                      position: 'relative',
+                      pl: 4,
+                    }}
+                  >
+                    <FormatQuoteIcon
+                      sx={{
+                        position: 'absolute',
+                        left: 0,
+                        top: -8,
+                        color: 'primary.main',
+                        opacity: 0.3,
+                      }}
+                    />
+                    {review.comment}
+                  </Typography>
+
+                  <Typography variant="body2" color="primary.main" sx={{ mt: 'auto' }}>
+                    {review.service}
+                  </Typography>
                 </Paper>
               </Grid>
             ))}
           </Grid>
         </Container>
       </Box>
+
+      {/* Review Menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleCloseMenu}
+      >
+        <MenuItem onClick={() => handleEditReview(reviews.find(r => r.id === activeReviewId))}>
+          Edit
+        </MenuItem>
+        <MenuItem onClick={handleDeleteReview} sx={{ color: 'error.main' }}>
+          Delete
+        </MenuItem>
+      </Menu>
+
+      {/* Review Dialog */}
+      <ReviewDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={handleSubmitReview}
+        initialData={selectedReview}
+      />
     </Box>
   );
 };

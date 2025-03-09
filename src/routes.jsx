@@ -4,7 +4,8 @@ import Services from './pages/Services';
 import Gallery from './pages/Gallery';
 import Reviews from './pages/Reviews';
 import Contact from './pages/Contact';
-import Admin from './pages/Admin';
+import AdminRoutes from './routes/adminRoutes';
+import Login from './pages/Login/Login';
 import NotFound from './pages/NotFound';
 
 const AppRoutes = () => {
@@ -15,7 +16,8 @@ const AppRoutes = () => {
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/reviews" element={<Reviews />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/admin/*" element={<Admin />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin/*" element={<AdminRoutes />} />
       <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>

@@ -5,17 +5,20 @@ import theme from './styles/theme'
 import Layout from './components/Layout'
 import AppRoutes from './routes'
 import store from './store'
+import { AuthProvider } from './context/AuthContext'
 
 function App() {
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
-          <Layout>
-            <AppRoutes />
-          </Layout>
-        </Router>
+        <AuthProvider>
+          <Router>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+          </Router>
+        </AuthProvider>
       </ThemeProvider>
     </Provider>
   )

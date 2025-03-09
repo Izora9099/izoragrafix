@@ -37,7 +37,7 @@ const Home = () => {
   ];
 
   return (
-    <Box>
+    <Box sx={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
       {/* Hero Section */}
       <Box
         sx={{
@@ -64,7 +64,7 @@ const Home = () => {
           }
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth={false} sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
           <Typography
             variant="h1"
             sx={{
@@ -74,7 +74,7 @@ const Home = () => {
               textAlign: 'center',
             }}
           >
-            Blending Design & Technology
+            Transform Your Vision Into Reality
           </Typography>
           <Typography
             variant="h2"
@@ -85,7 +85,7 @@ const Home = () => {
               textAlign: 'center',
             }}
           >
-            Your one-stop solution for graphic design and tech services
+            Professional graphic design and tech solutions for your business
           </Typography>
           <Box
             sx={{
@@ -116,7 +116,7 @@ const Home = () => {
       </Box>
 
       {/* Services Overview */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth={false} sx={{ py: 8, px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
         <Typography
           variant="h2"
           textAlign="center"
@@ -124,9 +124,9 @@ const Home = () => {
         >
           Our Services
         </Typography>
-        <Grid container spacing={4}>
+        <Grid container spacing={4} justifyContent="center">
           {services.map((service) => (
-            <Grid item xs={12} md={4} key={service.title}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={service.title}>
               <Card
                 sx={{
                   height: '100%',
@@ -197,7 +197,7 @@ const Home = () => {
           }
         }}
       >
-        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth={false} sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
           <Typography variant="h3" sx={{ mb: 3, textAlign: 'center' }}>
             Ready to Start Your Project?
           </Typography>
