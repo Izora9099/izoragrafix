@@ -9,7 +9,7 @@ import {
   Typography,
   Alert,
 } from '@mui/material';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');

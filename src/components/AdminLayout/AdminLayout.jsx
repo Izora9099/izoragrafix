@@ -21,6 +21,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const drawerWidth = 240;
 
@@ -36,6 +37,7 @@ const AdminLayout = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -44,6 +46,11 @@ const AdminLayout = ({ children }) => {
   const handleNavigation = (path) => {
     navigate(path);
     setMobileOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   const drawer = (
@@ -70,7 +77,7 @@ const AdminLayout = ({ children }) => {
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/logout')}>
+          <ListItemButton onClick={handleLogout}>
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>

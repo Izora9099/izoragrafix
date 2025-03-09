@@ -13,10 +13,12 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const Layout = ({ children }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const location = useLocation();
+  const { user } = useAuth();
 
   const pages = [
     { name: 'Home', path: '/' },
@@ -24,7 +26,7 @@ const Layout = ({ children }) => {
     { name: 'Gallery', path: '/gallery' },
     { name: 'Reviews', path: '/reviews' },
     { name: 'Contact', path: '/contact' },
-    { name: 'Admin', path: '/admin' },
+    ...(user ? [{ name: 'Admin', path: '/admin' }] : []),
   ];
 
   const handleOpenNavMenu = (event) => {
