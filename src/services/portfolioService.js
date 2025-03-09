@@ -7,11 +7,11 @@ import {
   getDocs,
   query,
   orderBy,
-  serverTimestamp,
-  where
+  where,
+  serverTimestamp
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '../config/firebase';
+import { db } from '../config/firebase';
+import { cloudinaryService } from './cloudinaryService';
 
 const COLLECTION_NAME = 'portfolio';
 
@@ -53,23 +53,32 @@ export const portfolioService = {
   // Add a new portfolio item with image upload
   addItem: async (itemData, imageFile) => {
     try {
-      // Upload image first
-      const imageRef = ref(storage, `portfolio/${Date.now()}_${imageFile.name}`);
-      await uploadBytes(imageRef, imageFile);
-      const imageUrl = await getDownloadURL(imageRef);
+      // Upload image to Cloudinary
+      const imageResult = await cloudinaryService.uploadImage(imageFile, 'portfolio');
 
-      // Add portfolio item with image URL
+      // Add portfolio item with image data to Firestore
       const docRef = await addDoc(collection(db, COLLECTION_NAME), {
         ...itemData,
-        image: imageUrl,
-        imagePath: imageRef.fullPath,
+        image: imageResult.url,
+        imagePublicId: imageResult.publicId,
+        imageDetails: {
+          width: imageResult.width,
+          height: imageResult.height,
+          format: imageResult.format
+        },
         createdAt: serverTimestamp()
       });
 
       return {
         id: docRef.id,
         ...itemData,
-        image: imageUrl
+        image: imageResult.url,
+        imagePublicId: imageResult.publicId,
+        imageDetails: {
+          width: imageResult.width,
+          height: imageResult.height,
+          format: imageResult.format
+        }
       };
     } catch (error) {
       console.error('Error adding portfolio item:', error);
@@ -88,23 +97,26 @@ export const portfolioService = {
 
       // If new image is provided, upload it and update URL
       if (imageFile) {
-        // Delete old image if exists
-        if (itemData.imagePath) {
-          const oldImageRef = ref(storage, itemData.imagePath);
-          await deleteObject(oldImageRef).catch(error => {
-            console.warn('Error deleting old image:', error);
-          });
+        // Delete old image from Cloudinary if exists
+        if (itemData.imagePublicId) {
+          await cloudinaryService.deleteImage(itemData.imagePublicId)
+            .catch(error => {
+              console.warn('Error deleting old image:', error);
+            });
         }
 
         // Upload new image
-        const imageRef = ref(storage, `portfolio/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(imageRef, imageFile);
-        const imageUrl = await getDownloadURL(imageRef);
+        const imageResult = await cloudinaryService.uploadImage(imageFile, 'portfolio');
 
         updateData = {
           ...updateData,
-          image: imageUrl,
-          imagePath: imageRef.fullPath
+          image: imageResult.url,
+          imagePublicId: imageResult.publicId,
+          imageDetails: {
+            width: imageResult.width,
+            height: imageResult.height,
+            format: imageResult.format
+          }
         };
       }
 
@@ -120,17 +132,17 @@ export const portfolioService = {
   },
 
   // Delete a portfolio item
-  deleteItem: async (id, imagePath) => {
+  deleteItem: async (id, imagePublicId) => {
     try {
-      // Delete image from storage
-      if (imagePath) {
-        const imageRef = ref(storage, imagePath);
-        await deleteObject(imageRef).catch(error => {
-          console.warn('Error deleting image:', error);
-        });
+      // Delete image from Cloudinary
+      if (imagePublicId) {
+        await cloudinaryService.deleteImage(imagePublicId)
+          .catch(error => {
+            console.warn('Error deleting image:', error);
+          });
       }
 
-      // Delete document
+      // Delete document from Firestore
       await deleteDoc(doc(db, COLLECTION_NAME, id));
       return id;
     } catch (error) {

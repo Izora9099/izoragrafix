@@ -1,11 +1,11 @@
-import { BrowserRouter as Router } from 'react-router-dom'
-import { ThemeProvider, CssBaseline } from '@mui/material'
-import { Provider } from 'react-redux'
-import theme from './styles/theme'
-import Layout from './components/Layout'
-import AppRoutes from './routes'
-import store from './store'
-import { AuthProvider } from './context/AuthContext'
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { Provider } from 'react-redux';
+import { AuthProvider } from './context/auth/AuthProvider';
+import AppRoutes from './routes';
+import Layout from './components/Layout/Layout';
+import theme from './styles/theme';
+import store from './store';
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
         </AuthProvider>
       </ThemeProvider>
     </Provider>
-  )
+  );
 }
 
-export default App
+export default App;

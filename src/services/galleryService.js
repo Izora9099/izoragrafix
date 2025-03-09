@@ -7,11 +7,11 @@ import {
   getDocs,
   query,
   orderBy,
-  serverTimestamp,
-  where
+  where,
+  serverTimestamp
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '../config/firebase';
+import { db } from '../config/firebase';
+import { cloudinaryService } from './cloudinaryService';
 
 const COLLECTION_NAME = 'gallery';
 
@@ -53,23 +53,32 @@ export const galleryService = {
   // Add a new gallery image
   addImage: async (imageData, imageFile) => {
     try {
-      // Upload image
-      const imageRef = ref(storage, `gallery/${Date.now()}_${imageFile.name}`);
-      await uploadBytes(imageRef, imageFile);
-      const imageUrl = await getDownloadURL(imageRef);
+      // Upload image to Cloudinary
+      const imageResult = await cloudinaryService.uploadImage(imageFile, 'gallery');
 
-      // Add gallery item with image URL
+      // Add gallery item with image data to Firestore
       const docRef = await addDoc(collection(db, COLLECTION_NAME), {
         ...imageData,
-        image: imageUrl,
-        imagePath: imageRef.fullPath,
+        image: imageResult.url,
+        imagePublicId: imageResult.publicId,
+        imageDetails: {
+          width: imageResult.width,
+          height: imageResult.height,
+          format: imageResult.format
+        },
         createdAt: serverTimestamp()
       });
 
       return {
         id: docRef.id,
         ...imageData,
-        image: imageUrl
+        image: imageResult.url,
+        imagePublicId: imageResult.publicId,
+        imageDetails: {
+          width: imageResult.width,
+          height: imageResult.height,
+          format: imageResult.format
+        }
       };
     } catch (error) {
       console.error('Error adding gallery image:', error);
@@ -88,23 +97,26 @@ export const galleryService = {
 
       // If new image is provided, upload it and update URL
       if (imageFile) {
-        // Delete old image if exists
-        if (imageData.imagePath) {
-          const oldImageRef = ref(storage, imageData.imagePath);
-          await deleteObject(oldImageRef).catch(error => {
-            console.warn('Error deleting old image:', error);
-          });
+        // Delete old image from Cloudinary if exists
+        if (imageData.imagePublicId) {
+          await cloudinaryService.deleteImage(imageData.imagePublicId)
+            .catch(error => {
+              console.warn('Error deleting old image:', error);
+            });
         }
 
         // Upload new image
-        const newImageRef = ref(storage, `gallery/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(newImageRef, imageFile);
-        const imageUrl = await getDownloadURL(newImageRef);
+        const imageResult = await cloudinaryService.uploadImage(imageFile, 'gallery');
 
         updateData = {
           ...updateData,
-          image: imageUrl,
-          imagePath: newImageRef.fullPath
+          image: imageResult.url,
+          imagePublicId: imageResult.publicId,
+          imageDetails: {
+            width: imageResult.width,
+            height: imageResult.height,
+            format: imageResult.format
+          }
         };
       }
 
@@ -120,17 +132,17 @@ export const galleryService = {
   },
 
   // Delete a gallery image
-  deleteImage: async (id, imagePath) => {
+  deleteImage: async (id, imagePublicId) => {
     try {
-      // Delete image from storage
-      if (imagePath) {
-        const imageRef = ref(storage, imagePath);
-        await deleteObject(imageRef).catch(error => {
-          console.warn('Error deleting image:', error);
-        });
+      // Delete image from Cloudinary
+      if (imagePublicId) {
+        await cloudinaryService.deleteImage(imagePublicId)
+          .catch(error => {
+            console.warn('Error deleting image:', error);
+          });
       }
 
-      // Delete document
+      // Delete document from Firestore
       await deleteDoc(doc(db, COLLECTION_NAME, id));
       return id;
     } catch (error) {

@@ -1,4 +1,4 @@
-import { 
+import {
   collection,
   addDoc,
   updateDoc,
@@ -36,6 +36,7 @@ export const reviewService = {
         ...reviewData,
         createdAt: serverTimestamp()
       });
+
       return {
         id: docRef.id,
         ...reviewData
@@ -50,13 +51,15 @@ export const reviewService = {
   updateReview: async (id, reviewData) => {
     try {
       const reviewRef = doc(db, COLLECTION_NAME, id);
-      await updateDoc(reviewRef, {
+      const updateData = {
         ...reviewData,
         updatedAt: serverTimestamp()
-      });
+      };
+
+      await updateDoc(reviewRef, updateData);
       return {
         id,
-        ...reviewData
+        ...updateData
       };
     } catch (error) {
       console.error('Error updating review:', error);

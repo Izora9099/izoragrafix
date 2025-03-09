@@ -1,44 +1,45 @@
 import { useState, useEffect } from 'react';
+import { auth } from '../../config/firebase';
 import { 
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import { AuthContext } from './authContextValue';
-import { auth } from '../config/firebase';
+import { AuthContext } from './authContext';
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
       setLoading(false);
     });
 
-    // Cleanup subscription
     return () => unsubscribe();
   }, []);
 
   const login = async (email, password) => {
     try {
-      // Only allow specific email to login
+      // Only allow admin email to login
       if (email !== 'izoragraphics@gmail.com') {
-        throw new Error('Unauthorized access');
+        throw new Error('Unauthorized access. Only admin can login.');
       }
+      
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setUser(userCredential.user);
       return userCredential.user;
     } catch (error) {
       console.error('Login error:', error);
-      throw new Error('Invalid credentials');
+      throw error;
     }
   };
 
   const logout = async () => {
     try {
       await signOut(auth);
+      setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -47,9 +48,9 @@ const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    loading,
     login,
-    logout,
-    loading
+    logout
   };
 
   return (
@@ -58,5 +59,3 @@ const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export { AuthProvider };
