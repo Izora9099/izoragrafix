@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'izoragraphics@gmail.com';
+    }
+    
+    // Portfolio images
+    match /portfolio/{fileName} {
+      allow read: if true; // Anyone can view portfolio images
+      allow write: if isAdmin(); // Only admin can upload/modify/delete
+    }
+    
+    // Gallery images
+    match /gallery/{fileName} {
+      allow read: if true; // Anyone can view gallery images
+      allow write: if isAdmin(); // Only admin can upload/modify/delete
+    }
+  }
+}

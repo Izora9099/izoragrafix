@@ -1,33 +1,48 @@
 import { useState, useEffect } from 'react';
+import { 
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 import { AuthContext } from './authContextValue';
+import { auth } from '../config/firebase';
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    // Cleanup subscription
+    return () => unsubscribe();
   }, []);
 
   const login = async (email, password) => {
-    // In a real app, this would make an API call
-    if (email === 'izoragraphics@gmail.com' && password === 'admin123') {
-      const userData = { email, role: 'admin' };
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      return true;
+    try {
+      // Only allow specific email to login
+      if (email !== 'izoragraphics@gmail.com') {
+        throw new Error('Unauthorized access');
+      }
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      return userCredential.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw new Error('Invalid credentials');
     }
-    throw new Error('Invalid credentials');
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
   };
 
   const value = {
