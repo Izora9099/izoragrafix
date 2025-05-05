@@ -14,6 +14,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { ThemeToggle } from '../ThemeToggle/ThemeToggle.jsx';
 
 const Layout = ({ children }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -76,7 +77,7 @@ const Layout = ({ children }) => {
             </Typography>
 
             {/* Mobile menu */}
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1, alignItems: 'center' }}>
               <IconButton
                 size="large"
                 aria-label="menu"
@@ -87,6 +88,7 @@ const Layout = ({ children }) => {
               >
                 <MenuIcon />
               </IconButton>
+              <ThemeToggle />
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorElNav}
@@ -138,7 +140,7 @@ const Layout = ({ children }) => {
             </Typography>
 
             {/* Desktop menu */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
               {pages.map((page) => (
                 <Button
                   key={page.name}
@@ -156,6 +158,7 @@ const Layout = ({ children }) => {
                   {page.name}
                 </Button>
               ))}
+              <ThemeToggle />
             </Box>
           </Toolbar>
         </Container>
