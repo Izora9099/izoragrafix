@@ -1,78 +1,80 @@
 # Izoragrafix Website
 
-A modern React.js website for Izoragrafix, a startup offering graphic design services and tech solutions.
+A modern React-based web platform for Izoragrafix, offering graphic design services and tech solutions with a focus on user experience and responsive design.
 
 ## Features
 
-- Modern, responsive design using Material-UI
-- Interactive service showcase
-- Portfolio/Gallery section
-- Customer reviews system
-- Admin dashboard for content management
-- Contact form with WhatsApp integration
+- 🎨 Modern, responsive UI built with Material-UI
+- 🔒 Secure authentication system
+- 📱 Cross-device compatibility
+- 📧 Contact form with EmailJS integration
+- 🔥 Firebase backend integration
+- 🎯 Dynamic content management
+- 🌓 Light/Dark theme support
+
+## Tech Stack
+
+- **Frontend**: React 18 with Vite
+- **UI Framework**: Material-UI v5
+- **State Management**: Redux Toolkit
+- **Routing**: React Router v6
+- **Form Handling**: Formik + Yup
+- **Backend Services**: Firebase & Appwrite
+- **Email Service**: EmailJS
+
+## Quick Start
+
+1. Clone and setup environment:
+   ```bash
+   git clone <repository-url>
+   cd izoragrafix
+   cp .env.example .env   # Configure your environment variables
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Run development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Build for production:
+   ```bash
+   npm run build
+   ```
 
 ## Project Structure
 
 ```
 izoragrafix/
 ├── src/
-│   ├── components/      # Reusable UI components
-│   ├── pages/          # Page components
-│   ├── store/          # Redux store and slices
-│   ├── styles/         # Theme and global styles
-│   ├── utils/          # Utility functions
-│   ├── services/       # API services
-│   ├── assets/         # Static assets
-│   └── App.jsx         # Main application component
+│   ├── components/     # Reusable UI components
+│   ├── context/       # React context providers
+│   ├── pages/         # Page components
+│   ├── assets/        # Static assets
+│   ├── styles/        # Theme configuration
+│   └── App.jsx        # Main component
+├── .env.example       # Environment variables template
+├── firestore.rules    # Firebase security rules
+└── storage.rules      # Firebase storage rules
 ```
 
-## Tech Stack
+## Development
 
-- React 18+
-- Vite (Build tool)
-- Material-UI (UI Framework)
-- Redux Toolkit (State Management)
-- React Router (Navigation)
-- Formik + Yup (Form Management)
+- Run `npm run lint` to check code quality
+- Use `npm run preview` to preview production build
+- Follow the ESLint configuration for consistent code style
 
-## Getting Started
+## Environment Variables
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start development server:
-   ```bash
-   npm run dev
-   ```
-
-3. Build for production:
-   ```bash
-   npm run build
-   ```
-
-## Development Status
-
-Current implementation includes:
-- Basic project structure
-- Navigation and routing setup
-- Homepage with hero section and service overview
-- Theme configuration
-- Redux store setup
-
-Next steps:
-- Implement remaining pages (Services, Gallery, Reviews, Contact)
-- Set up admin dashboard
-- Add authentication
-- Integrate with backend services
-
-## Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Submit a pull request
+Required environment variables (see `.env.example`):
+- Firebase configuration
+- EmailJS credentials
+- API endpoints
 
 ## License
 
-MIT License
+MIT License - feel free to use and modify for your projects.
